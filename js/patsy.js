@@ -2,7 +2,47 @@ var patsy = {
 	
 	cli: function( selector, dir, defaultTmpl ) {
 		
-		var prompt = $( selector );
+		var that = this;
+		this.prompt = $( selector );
+		this.currentDir = dir;
+
+		this.prompt.on( "keydown", function( e ) {
+			var commandLine = that.prompt.find( "span.cli:last" ),
+				txt = commandLine.text(),
+				cmd,
+				dirs;
+			if ( e.keyCode != 13 ) {
+				commandLine.text( txt + e.keyCode );
+			} else {
+				cmd = txt.substring( 0, txt.indexOf( " " ) );
+				if ( cmd == "ls" ) {
+					require( ["text!" + dir + "/index.tmpl"], function( tmpl) {
+						patsy.render( tmpl, that.prompt );
+					});
+				} else if ( cmd == "cd" ) {
+					txt = txt.replace( "cd " ).split( "/" );
+					dirs = this.currentDir.split( "/" );
+					for ( var i=0; i<txt.length; i++ ) {
+						if ( txt[i] == ".." ) {
+							dirs.pop();
+						} else {
+							dirs.push( txt[i] );
+						}
+					}
+					this.currentDir = dirs.join( "/" );
+				} else {
+					txt = txt.replace( cmd, "" );
+					require( ["text!" + that.currentDir + "/" + cmd], function( tmpl ) {
+						patsy.render( txt.length ?
+							patsy.append( tmpl, txt ) :
+							patsy.append( tmpl ),
+							that.prompt						
+						);
+					});
+				}
+			}
+
+		});
 
 	},
 	render: function( html, prompt ) {
@@ -49,8 +89,12 @@ var patsy = {
 	        renderer.output.html(html.substring(0,(ending>=0?ending:html.length)) + toAdd + closing);                    
 	    }
 	},
-	type: function( key, prompt ) {
-		
+	append: function( tmpl ) {
+		if ( tmpl, data ) {
+			return doT.template( tmpl )( data );
+		} else {
+			return '<div class="patsy-prompt">$ <span class="patsy-cli"></span></div>';
+		}
 	}
 
 };
