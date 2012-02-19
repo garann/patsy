@@ -32,7 +32,6 @@ var patsy = {
 								dirs.push( txt[i] );
 							}
 						}
-						console.dir(dirs);
 						that.currentDir = dirs.join( "/" );
 						that.render( patsy.getHtml() );
 					} else {
@@ -48,6 +47,7 @@ var patsy = {
 						});
 					}
 				}
+				return false;
 			}
 		});
 
