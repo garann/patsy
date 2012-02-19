@@ -23,8 +23,8 @@ var patsy = {
 							});
 						});
 					} else if ( cmd == "cd" ) {
-						txt = txt.replace( "cd " ).split( "/" );
-						dirs = this.currentDir.split( "/" );
+						txt = txt.replace( "cd ", "" ).split( "/" );
+						dirs = that.currentDir.split( "/" );
 						for ( var i=0; i<txt.length; i++ ) {
 							if ( txt[i] == ".." ) {
 								dirs.pop();
@@ -32,7 +32,9 @@ var patsy = {
 								dirs.push( txt[i] );
 							}
 						}
-						this.currentDir = dirs.join( "/" );
+						console.dir(dirs);
+						that.currentDir = dirs.join( "/" );
+						that.render( patsy.getHtml() );
 					} else {
 						txt = txt.replace( cmd, "" );
 						require( ["text!" + that.currentDir + "/" + cmd + ".tmpl"], function( tmpl ) {
