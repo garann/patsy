@@ -5,19 +5,19 @@ var patsy = {
 		var that = this;
 		this.prompt = $( selector );
 		this.currentDir = dir;
+		this.commandLine;
 
 		this.prompt.on( "keydown", function( e ) {
-			var commandLine = that.prompt.find( "span.cli:last" ),
-				txt = commandLine.text(),
+			var txt = that.commandLine.text(),
 				cmd,
 				dirs;
 			if ( e.keyCode != 13 ) {
-				commandLine.text( txt + e.keyCode );
+				that.commandLine.text( txt + e.keyCode );
 			} else {
 				cmd = txt.substring( 0, txt.indexOf( " " ) );
 				if ( cmd == "ls" ) {
 					require( ["text!" + dir + "/index.tmpl"], function( tmpl) {
-						patsy.render( tmpl, that.prompt );
+						that.render( patsy.getHtml( tmpl ) );
 					});
 				} else if ( cmd == "cd" ) {
 					txt = txt.replace( "cd " ).split( "/" );
@@ -32,11 +32,10 @@ var patsy = {
 					this.currentDir = dirs.join( "/" );
 				} else {
 					txt = txt.replace( cmd, "" );
-					require( ["text!" + that.currentDir + "/" + cmd], function( tmpl ) {
-						patsy.render( txt.length ?
-							patsy.append( tmpl, txt ) :
-							patsy.append( tmpl ),
-							that.prompt						
+					require( ["text!" + that.currentDir + "/" + cmd + ".tmpl"], function( tmpl ) {
+						that.render( txt.length ?
+							patsy.getHtml( tmpl, txt ) :
+							patsy.getHtml( tmpl )			
 						);
 					});
 				}
@@ -44,54 +43,45 @@ var patsy = {
 
 		});
 
-	},
-	render: function( html, prompt ) {
-		this.txt = html;
-		this.output = prompt;
+		this.render = function( html ) {
+			var txt = html.replace( "\n", "<br/>" ),
+				output = that.prompt.append( '<div class="patsy-prompt"></div>' ),
+				l = txt.length,
+				p = 0,
+				closing = "",
+				printer = setInterval(function() {
+				   if (p < l) {
+				       printf(p);  
+				   } else {
+				       clearInterval(printer);
+				       that.commandLine = output;
+			       }
+				}, 100);        
+	    
+		    function printf(position) {
+		        var matches = txt.substr(position).match(/<(\/)?([^ \/>]*).*?(\/)?>|./),
+		            html = output.html(),
+		            ending;
+		        if ( matches[2] && !matches[3] ) {
+		            ending = closing.length ? html.lastIndexOf(closing) : -1;
+	                closing = "</" + matches[2] + ">" + closing;
+	            } else if ( matches[1] ) {
+	            	ending = closing.length ? html.lastIndexOf(closing) : -1;
+		            closing = closing.replace(("</" + matches[2] + ">"),"");
+		        } else {
+		            ending = html.lastIndexOf(closing);
+		        }
+		        p += matches[0].length;
+		        output.html(html.substring(0,(ending>=0?ending:html.length)) + matches[0] + closing);                    
+		    }
+		}
 
-		var renderer = this,
-			l = this.txt.length,
-			p = 0,
-			closing = "",
-			printer = setInterval(function() {
-			   if (p < l)
-			       printf(p);  
-			   else
-			       clearInterval(printer);
-			}, 100);        
-    
-	    function printf(position) {
-	        var char = txt.charAt(position),
-	            toAdd = "",
-	            toBePrinted,
-	            html = renderer.output.html(),
-	            ending;
-	        if (char == "\n") {
-	            toAdd = "<br/>";
-	            p++; 
-	            ending = html.lastIndexOf(closing);
-	        } else if (char == "<") {
-	            toBePrinted = renderer.txt.substr(position);
-	            p = position + toBePrinted.indexOf(">") + 1;
-	            toAdd = renderer.txt.substring(position,p);
-	            if (toBePrinted.charAt(1) == "/") {
-	                ending = closing.length ? html.lastIndexOf(closing) : -1;
-	                closing = closing.replace(("</" + toBePrinted.charAt(2) + ">"),"");
-	            } else {
-	                ending = closing.length ? html.lastIndexOf(closing) : -1;
-	                closing = "</" + toBePrinted.charAt(1) + ">" + closing;
-	            }
-	        } else {
-	            toAdd = char;
-	            p++;
-	            ending = html.lastIndexOf(closing);
-	        }
-	        renderer.output.html(html.substring(0,(ending>=0?ending:html.length)) + toAdd + closing);                    
-	    }
+		this.render( patsy.getHtml() );
+
 	},
-	append: function( tmpl ) {
-		if ( tmpl, data ) {
-			return doT.template( tmpl )( data );
+	getHtml: function( tmpl, data ) {
+		if ( tmpl ) {
+			return doT.template( tmpl )( data || {} );
 		} else {
 			return '<div class="patsy-prompt">$ <span class="patsy-cli"></span></div>';
 		}
