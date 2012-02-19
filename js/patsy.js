@@ -72,7 +72,7 @@ var patsy = {
 				       if ( output.find( "span.patsy-cli" )[0] ) that.commandLine = output.find( "span.patsy-cli" );
 				       if ( callback ) callback();
 			       }
-				}, 10);        
+				}, 5);        
 	    
 		    function printf(position) {
 		        var matches = txt.substr(position).match(/<(\/)?([^ \/>]*).*?(\/)?>|./),
