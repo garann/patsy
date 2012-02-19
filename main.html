@@ -1,17 +1,19 @@
 <!doctype html>
-<html>
+<html lang="en" dir="ltr">
 	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>patsy test page</title>
+		<style>
+		#prompt { background-color: #000; color: #fff; font-family: mono; }
+		</style>
+		<script data-main="js/patsy" src="js/require.js"></script>
 	</head>
 	<body>
 		<div id="prompt"></div>
 	</body>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script src="js/require.js"></script>
-	<script src="js/doT.js"></script>
-	<script src="js/patsy.js"></script>
 	<script>
-	$(function() {
+	require( ["doT"], function() {
 		patsy.cli( "#prompt", "patsy-screens" );
 	});
 	</script>
