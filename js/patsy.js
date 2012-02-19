@@ -12,8 +12,10 @@ var patsy = {
 				var txt = that.commandLine.text(),
 					cmd,
 					dirs;
-				if ( e.keyCode != 13 ) {
-					that.commandLine.text( txt + String.fromCharCode( e.keyCode ) );
+				if ( e.keyCode == 8 ) {
+					that.commandLine.text( txt.substring( 0, txt.length-1 ) );
+				} else if ( e.keyCode != 13 ) {
+					that.commandLine.text( txt + String.fromCharCode( e.keyCode || e.charCode ) );
 				} else {
 					cmd = txt.indexOf( " " ) > -1 ? txt.substring( 0,  txt.indexOf( " " ) ) : txt;
 					if ( cmd == "ls" ) {
