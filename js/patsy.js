@@ -17,7 +17,7 @@ var patsy = {
 				} else {
 					cmd = txt.indexOf( " " ) > -1 ? txt.substring( 0,  txt.indexOf( " " ) ) : txt;
 					if ( cmd == "ls" ) {
-						require( ["text!" + dir + "/index.tmpl"], function( tmpl) {
+						require( ["text!" + that.currentDir + "/index.tmpl"], function( tmpl ) {
 							that.render( patsy.getHtml( tmpl ), function() {
 								that.render( patsy.getHtml() );	
 							});
@@ -70,6 +70,7 @@ var patsy = {
 				       clearInterval(printer);
 				       output.addClass( "patsy-active" );
 				       if ( output.find( "span.patsy-cli" )[0] ) that.commandLine = output.find( "span.patsy-cli" );
+				       that.prompt.scrollTop( 9999 );
 				       if ( callback ) callback();
 			       }
 				}, 5);        
@@ -88,13 +89,24 @@ var patsy = {
 		            ending = html.lastIndexOf(closing);
 		        }
 		        p += matches[0].length;
-		        output.html(html.substring(0,(ending>=0?ending:html.length)) + matches[0] + closing);                    
+		        output.html(html.substring(0,(ending>=0?ending:html.length)) + matches[0] + closing); 
+		        if ( matches[0].indexOf( "<br" ) > -1 ) {
+		        	that.prompt.scrollTop( 9999 );
+		        }                    
 		    }
 		}
 
 		doT.templateSettings.strip = false;
-		this.render( patsy.getHtml() );
 
+		if ( defaultTmpl ) {
+			require( ["text!" + this.currentDir + "/" + defaultTmpl + ".tmpl"], function( tmpl ) {
+				that.render( patsy.getHtml( tmpl ), function() {
+					that.render( patsy.getHtml() );	
+				});
+			});
+		} else {
+			this.render( patsy.getHtml() );
+		}
 	},
 	getHtml: function( tmpl, data ) {
 		if ( tmpl ) {

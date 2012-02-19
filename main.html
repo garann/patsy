@@ -4,7 +4,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>patsy test page</title>
 		<style>
-		#prompt { background-color: #000; color: #fff; font-family: monospace; white-space: pre; }
+		#prompt { margin: 50px auto; width: 950px; height: 650px; overflow: auto; padding: 10px; background-color: #000; color: #fff; font-family: monospace; white-space: pre; }
 		.patsy-prompt b { display: none; }
 		.patsy-active b { display: inline; }
 		</style>
@@ -16,7 +16,7 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script>
 	require( ["doT"], function() {
-		patsy.cli( "#prompt", "patsy-screens" );
+		patsy.cli( "#prompt", "patsy-screens", "thanks" );
 	});
 	</script>
 </html>
