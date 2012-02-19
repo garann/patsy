@@ -1,0 +1,33 @@
+                        88                                                                                         
+                        ""                                                          ,d                             
+                                                                                    88                             
+88       88  ,adPPYba,  88  8b,dPPYba,    ,adPPYb,d8     8b,dPPYba,   ,adPPYYba,  MM88MMM  ,adPPYba,  8b       d8  
+88       88  I8[    ""  88  88P'   `"8a  a8"    `Y88     88P'    "8a  ""     `Y8    88     I8[    ""  `8b     d8'  
+88       88   `"Y8ba,   88  88       88  8b       88     88       d8  ,adPPPPP88    88      `"Y8ba,    `8b   d8'   
+"8a,   ,a88  aa    ]8I  88  88       88  "8a,   ,d88     88b,   ,a8"  88,    ,88    88,    aa    ]8I    `8b,d8'    
+ `"YbbdP'Y8  `"YbbdP"'  88  88       88   `"YbbdP"Y8     88`YbbdP"'   `"8bbdP"Y8    "Y888  `"YbbdP"'      Y88'     
+                                          aa,    ,88     88                                               d8'      
+                                           "Y8bbdP"      88                                              d8'       
+
+
+[[ Dependencies ]]
+
+patsy needs require.js and the require.js text plugin. It also uses doT.js for template rendering, but you can get
+rid of that if you want. It's also using jQuery, but only to save time - if you want to use a different library it 
+should be pretty easy to swap it out.
+
+[[ Setup ]]
+
+Create a command line by calling patsy.cli(). cli() takes three arguments: the selector for the command line 
+container, the directory (relative to the location of require.js) where templates will live, and, optionally, a 
+template to render on load if you don't want to go straight to the command prompt.
+
+Templates are just HTML, but they'll be rendered assuming they're preformatted, so add your own word-wrapping. 
+Character entities won't get rendered correctly if you use the code, so just paste the actual character in.
+
+[[ Commands ]]
+
+ls shows index.tmpl in the current directory - you have to create that yourself, no magic :(
+cd changes directories, and you can go up a directory with ../
+the name of a template in the current directory will render it - you can also pass in data as JSON, like so:
+	$ myTemplate { "foo": "bar" }

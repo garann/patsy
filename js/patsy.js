@@ -18,7 +18,9 @@ var patsy = {
 					cmd = txt.indexOf( " " ) > -1 ? txt.substring( 0,  txt.indexOf( " " ) ) : txt;
 					if ( cmd == "ls" ) {
 						require( ["text!" + dir + "/index.tmpl"], function( tmpl) {
-							that.render( patsy.getHtml( tmpl ) );
+							that.render( patsy.getHtml( tmpl ), function() {
+								that.render( patsy.getHtml() );	
+							});
 						});
 					} else if ( cmd == "cd" ) {
 						txt = txt.replace( "cd " ).split( "/" );
@@ -36,7 +38,10 @@ var patsy = {
 						require( ["text!" + that.currentDir + "/" + cmd + ".tmpl"], function( tmpl ) {
 							that.render( txt.length ?
 								patsy.getHtml( tmpl, txt ) :
-								patsy.getHtml( tmpl )			
+								patsy.getHtml( tmpl ),
+								function() {
+									that.render( patsy.getHtml() );
+								}			
 							);
 						});
 					}
@@ -45,12 +50,16 @@ var patsy = {
 		});
 
 		this.prompt.on( "click", function() {
-			that.commandLine = $( this ).find( "span.patsy-cli" );
+			var $t = $( this );
+			$t.find( "div.patsy-prompt:last" ).addClass( "patsy-active" );
+			that.commandLine = $t.find( "span.patsy-cli:last" );
 		});
 
-		this.render = function( html ) {
-			var txt = html.replace( "\n", "<br/>" ),
-				output = that.prompt.append( '<div class="patsy-prompt"></div>' ),
+		this.render = function( html, callback ) {
+			that.prompt.find( "div.patsy-active" ).removeClass( "patsy-active" );
+			that.commandLine = null;
+			var txt = html.replace( /\n/gi, "<br/>" ),
+				output = $( '<div class="patsy-prompt"></div>' ).appendTo( that.prompt ),
 				l = txt.length,
 				p = 0,
 				closing = "",
@@ -59,9 +68,11 @@ var patsy = {
 				       printf(p);  
 				   } else {
 				       clearInterval(printer);
-				       that.commandLine = output;
+				       output.addClass( "patsy-active" );
+				       if ( output.find( "span.patsy-cli" )[0] ) that.commandLine = output.find( "span.patsy-cli" );
+				       if ( callback ) callback();
 			       }
-				}, 100);        
+				}, 10);        
 	    
 		    function printf(position) {
 		        var matches = txt.substr(position).match(/<(\/)?([^ \/>]*).*?(\/)?>|./),
@@ -81,15 +92,15 @@ var patsy = {
 		    }
 		}
 
+		doT.templateSettings.strip = false;
 		this.render( patsy.getHtml() );
 
 	},
 	getHtml: function( tmpl, data ) {
 		if ( tmpl ) {
-			console.log(tmpl)
 			return doT.template( tmpl )( data || {} );
 		} else {
-			return '<div class="patsy-prompt">$ <span class="patsy-cli"></span>▒</div>';
+			return '$ <span class="patsy-cli"></span><b>▒</b>';
 		}
 	}
 
