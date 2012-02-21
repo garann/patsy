@@ -5,18 +5,39 @@ var patsy = {
 		var that = this;
 		this.prompt = $( selector );
 		this.currentDir = dir;
+		this.cmdBuffer = [];
+		this.bufferPos;
 		this.commandLine;
 
+		$( document ).on( "keydown", function( e ) {
+			if ( that.prompt.is( ":focus" ) ) {
+				if ( e.keyCode == 8 ) {
+					that.commandLine.text( txt.substring( 0, txt.length-1 ) );
+					return false;
+				} else if ( e.keyCode == 38 ) { 
+					that.commandLine.text( that.cmdBuffer[that.bufferPos--] );
+					return false;
+				} else if ( e.keyCode == 40 ) { 
+					if ( that.bufferPos == that.cmdBuffer.length-1 ) {
+						that.commandLine.text( "" );
+					} else {
+						that.commandLine.text( that.cmdBuffer[++that.bufferPos] );
+					}
+					return false;
+				}
+			}
+		});
+
 		$( document ).on( "keypress", function( e ) {
-			if ( that.commandLine ) {
+			if ( that.prompt.is( ":focus" ) ) {
 				var txt = that.commandLine.text(),
 					cmd,
 					dirs;
-				if ( e.keyCode == 8 ) {
-					that.commandLine.text( txt.substring( 0, txt.length-1 ) );
-				} else if ( e.keyCode != 13 ) {
+				if ( e.keyCode != 13 ) {
 					that.commandLine.text( txt + String.fromCharCode( e.keyCode || e.charCode ) );
 				} else {
+					that.cmdBuffer.push( txt );
+					that.bufferPos = that.cmdBuffer.length-1;
 					cmd = txt.indexOf( " " ) > -1 ? txt.substring( 0,  txt.indexOf( " " ) ) : txt;
 					if ( cmd == "ls" ) {
 						require( ["text!" + that.currentDir + "/index.tmpl"], function( tmpl ) {
@@ -114,7 +135,12 @@ var patsy = {
 	},
 	getHtml: function( tmpl, data ) {
 		if ( tmpl ) {
-			return doT.template( tmpl )( data || {} );
+			if ( data ) {
+				data = JSON.parse( data );
+			} else {
+				data = {};
+			}
+			return doT.template( tmpl )( data );
 		} else {
 			return '$ <span class="patsy-cli"></span><b>▒</b>';
 		}
