@@ -60,6 +60,12 @@ var patsy = {
 					} else {
 						txt = txt.replace( cmd, "" );
 						require( ["text!" + that.currentDir + "/" + cmd + ".tmpl"], function( tmpl ) {
+							if ( tmpl.indexOf( "<title>Error response</title>" ) >= 0 ) {
+								that.render( that.commandLine.text() + ": command not found", function() {
+									that.render( patsy.getHtml() );	
+								});
+								return false;
+							}
 							that.render( txt.length ?
 								patsy.getHtml( tmpl, txt ) :
 								patsy.getHtml( tmpl ),
@@ -100,21 +106,21 @@ var patsy = {
 			       }
 				}, 5);        
 	    
-		    function printf(position) {
-		        var matches = txt.substr(position).match(/<(\/)?([^ \/>]*).*?(\/)?>|./),
+		    function printf( position ) {
+		        var matches = txt.substr( position ).match( /<(\/)?([^ \/>]*).*?(\/)?>|./ ),
 		            html = output.html(),
 		            ending;
 		        if ( matches[1] ) {
 	            	ending = closing.length ? html.lastIndexOf(closing) : -1;
-		            closing = closing.replace(("</" + matches[2] + ">"),"");
+		            closing = closing.replace( ( "</" + matches[2] + ">" ) ,"" );
 		        } else if ( matches[2] && !matches[3] ) {
 		            ending = closing.length ? html.lastIndexOf(closing) : -1;
 	                closing = "</" + matches[2] + ">" + closing;
 	            } else {
-		            ending = html.lastIndexOf(closing);
+		            ending = html.lastIndexOf( closing );
 		        }
 		        p += matches[0].length;
-		        output.html(html.substring(0,(ending>=0?ending:html.length)) + matches[0] + closing); 
+		        output.html( html.substring( 0,( ending>=0?ending:html.length ) ) + matches[0] + closing ); 
 		        if ( matches[0].indexOf( "<br" ) > -1 ) {
 		        	that.prompt.scrollTop( 9999 );
 		        }                    
